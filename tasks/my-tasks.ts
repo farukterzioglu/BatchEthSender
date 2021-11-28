@@ -7,8 +7,6 @@ import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-web3";
 import "@typechain/hardhat";
 
-require("hardhat/config") 
-
 task("balance", "Prints an account's balance")
   .addParam("account", "The account's address")
   .setAction(async (taskArgs, { web3 }) => {

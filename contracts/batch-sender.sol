@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.6;
 
-import '@openzeppelin/contracts/math/SafeMath.sol';
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import '@openzeppelin/contracts/utils/math/SafeMath.sol';
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract BatchSender is PullPayment {
+contract BatchSender is ReentrancyGuard {
     using SafeMath for uint256;
-    using EnumerableMap for EnumerableMap.UintToAddressMap;
 
     address payable private _owner;
 
@@ -32,16 +31,15 @@ contract BatchSender is PullPayment {
 
     function sendEther(
         address receiver1, uint amount1,
-        address receiver2, uint amount2,
-        EnumerableMap.UintToAddressMap balanceMap
+        address receiver2, uint amount2
     ) public payable nonReentrant onlyOwner {
-        require(msg.sender.isContract == false, "Contract receivers are not supported");
+        // require(msg.sender.isContract == false, "Contract receivers are not supported");
 
         // Sum the amounts to pay
         // for (uint256 i = 0; i < balanceMap.length; i++) {
         //     totalAmountToTransfer += EnumerableMap.UintToAddressMap.at(balanceMap, i);
         // }
-        totalAmountToTransfer = amount1 + amount2; // TODO: remove 
+        uint totalAmountToTransfer = amount1 + amount2; // TODO: remove 
 
         // Send to all recipients
         {

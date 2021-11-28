@@ -3,12 +3,12 @@ import { run, ethers } from "hardhat";
 async function main() {
     await run("compile");
 
-    const Greeter = await ethers.getContractFactory("Greeter");
-    const greeter = await Greeter.deploy("Hello, Hardhat!");
+    const BatchSender = await ethers.getContractFactory("BatchSender");
+    const batchSender = await BatchSender.deploy();
 
-    await greeter.deployed();
+    await batchSender.deployed();
   
-    console.log("Greeter deployed to:", greeter.address);
+    console.log("Batch sender deployed to:", batchSender.address);
   }
   
   main()

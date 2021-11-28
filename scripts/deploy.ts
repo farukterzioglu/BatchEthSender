@@ -1,8 +1,9 @@
-const hre = require("hardhat");
+import { run, ethers } from "hardhat";
 
 async function main() {
-    // We get the contract to deploy
-    const Greeter = await hre.ethers.getContractFactory("Greeter");
+    await run("compile");
+
+    const Greeter = await ethers.getContractFactory("Greeter");
     const greeter = await Greeter.deploy("Hello, Hardhat!");
 
     await greeter.deployed();

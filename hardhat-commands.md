@@ -23,3 +23,10 @@ npm install --save-dev @nomiclabs/hardhat-web3 web3
 
 # Run tasks
 npx hardhat balance --account 0xFe0Cbd2526340F49Ce414a84e7F7E9621669063f --network ropsten
+npx hardhat blockNumber --network ropsten
+
+
+# Notes
+https://hardhat.org/getting-started/
+https://hardhat.org/guides/typescript.html
+https://github.com/nomiclabs/hardhat-hackathon-boilerplate

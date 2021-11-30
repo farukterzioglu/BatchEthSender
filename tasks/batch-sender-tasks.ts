@@ -2,16 +2,19 @@ import { task, subtask } from "hardhat/config";
 import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-web3";
 import {AbiItem} from 'web3-utils';
+import HDWalletProvider from "@truffle/hdwallet-provider";
 
 task("batch-send", "Send batch ETH transfers")
   .addParam("contact", "Contract address")
-  .addParam("receiver", "The receiver's address")
   .addParam("amount", "Amount to send")
   .setAction(async (taskArgs, { web3 }) => {
       console.log(`Sending Eth...`);
 
       const accounts = await web3.eth.getAccounts();
       const senderAccount = accounts[0];
+      console.log({ senderAccount});
+
+      const amountToPay: number = +taskArgs.amount;
 
       const abi : AbiItem[]= [
         {
@@ -58,24 +61,14 @@ task("batch-send", "Send batch ETH transfers")
         {
           "inputs": [
             {
-              "internalType": "address",
-              "name": "receiver1",
-              "type": "address"
+              "internalType": "address[]",
+              "name": "recipients",
+              "type": "address[]"
             },
             {
-              "internalType": "uint256",
-              "name": "amount1",
-              "type": "uint256"
-            },
-            {
-              "internalType": "address",
-              "name": "receiver2",
-              "type": "address"
-            },
-            {
-              "internalType": "uint256",
-              "name": "amount2",
-              "type": "uint256"
+              "internalType": "uint256[]",
+              "name": "amounts",
+              "type": "uint256[]"
             }
           ],
           "name": "sendEther",
@@ -84,20 +77,55 @@ task("batch-send", "Send batch ETH transfers")
           "type": "function"
         }
       ];
-
       let contract = new web3.eth.Contract(abi, taskArgs.contact);
 
+      var paymentCount = 15;
+      let receiverList : string[] = [
+        '0x5caecc53d3640ebd9d10c73462e760032804baee',
+        '0x4ce2992294fd9ff13a0913c8411a47dec5809e0c',
+        '0x6a9b88763f662abfcfd656646187f02c3efad57a',
+        '0x2956b23e6e247bce5f6a4a3e8b4e80124a2516a6',
+        '0x9e19ebe84e21010bff95ca96b4a70647e4520f22',
+        '0x862a022df7005ffc23f059ea2537c463b708213e',
+        '0x61646777647274a49f5c469460fb874864608684',
+        '0x467678512cde2cb624c14c3651370778a48a560c',
+        '0xaa745ecc1425efe0cdf5131686b2047a80f03632',
+        '0xbd295e281ea25437c4942d869fddf6a0450f6e52',
+        '0xac869228d16a8d67872385cf712895b9ee518fe0',
+        '0x6f6ec962f3fa3631e1afa1f8f98f055bb55a0ba7',
+        '0x19d6dec1ce9998499107fb4db5066581804d0f4e',
+        '0x34ba8891f3610d98faf7ec8a53c3d2f5537698b2',
+        '0x307c225fd184770ba965f5c468183165f9eb540f'
+      ];
+
+      let amountList : string[] = new Array(paymentCount);
+      var totalAmount: number = 0;
+      for (let i = 0; i < paymentCount; i++) {
+        amountList[i] = taskArgs.amount;
+        console.log(`Sending ${web3.utils.fromWei(amountList[i], 'ether')} ETH to ${receiverList[i]}`);
+
+        totalAmount += +web3.utils.fromWei(amountList[i], 'ether')
+      }
+      console.log(`Total Eth to send    : ${totalAmount}`);
+      console.log(`Total Eth to attach  : ${web3.utils.fromWei( (amountToPay * paymentCount + amountToPay).toString(), 'ether')}`);
+      
+      receiverList = receiverList.slice(0, paymentCount);
+
+      // TODO: set gas limit 21000 * nUsers
       await contract.methods
-        .sendEther(
-          taskArgs.receiver, taskArgs.amount, 
-          "0x57C88A506df612e485BD0bd414dCE5F3a529998a", "100000000000000")
-        .send({ from: senderAccount }, function (err: any, res: any) {
-          if (err) {
-            console.log("An error occured", err)
-            return
+        .sendEther(receiverList, amountList)
+        .send({ 
+          from: senderAccount, 
+          value: (amountToPay * paymentCount + amountToPay).toString()
+          }, 
+          function (err: any, res: any) {
+            if (err) {
+              console.log("An error occured", err)
+              return
+            }
+            console.log("Hash of the transaction: " + res)
           }
-          console.log("Hash of the transaction: " + res)
-        })
+        )
       
     }
 );

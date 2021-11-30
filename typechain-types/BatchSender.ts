@@ -19,12 +19,12 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface BatchSenderInterface extends utils.Interface {
   functions: {
-    "sendEther(address,uint256,address,uint256)": FunctionFragment;
+    "sendEther(address[],uint256[])": FunctionFragment;
   };
 
   encodeFunctionData(
     functionFragment: "sendEther",
-    values: [string, BigNumberish, string, BigNumberish]
+    values: [string[], BigNumberish[]]
   ): string;
 
   decodeFunctionResult(functionFragment: "sendEther", data: BytesLike): Result;
@@ -77,28 +77,22 @@ export interface BatchSender extends BaseContract {
 
   functions: {
     sendEther(
-      receiver1: string,
-      amount1: BigNumberish,
-      receiver2: string,
-      amount2: BigNumberish,
+      recipients: string[],
+      amounts: BigNumberish[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
 
   sendEther(
-    receiver1: string,
-    amount1: BigNumberish,
-    receiver2: string,
-    amount2: BigNumberish,
+    recipients: string[],
+    amounts: BigNumberish[],
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   callStatic: {
     sendEther(
-      receiver1: string,
-      amount1: BigNumberish,
-      receiver2: string,
-      amount2: BigNumberish,
+      recipients: string[],
+      amounts: BigNumberish[],
       overrides?: CallOverrides
     ): Promise<void>;
   };
@@ -116,20 +110,16 @@ export interface BatchSender extends BaseContract {
 
   estimateGas: {
     sendEther(
-      receiver1: string,
-      amount1: BigNumberish,
-      receiver2: string,
-      amount2: BigNumberish,
+      recipients: string[],
+      amounts: BigNumberish[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
     sendEther(
-      receiver1: string,
-      amount1: BigNumberish,
-      receiver2: string,
-      amount2: BigNumberish,
+      recipients: string[],
+      amounts: BigNumberish[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

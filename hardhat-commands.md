@@ -32,3 +32,7 @@ sendeth --account 0xc718b100269fd4bbfef5521bb0a973870c07744e --network ropsten
 https://hardhat.org/getting-started/
 https://hardhat.org/guides/typescript.html
 https://github.com/nomiclabs/hardhat-hackathon-boilerplate
+
+## Packages  
+npm install @truffle/hdwallet-provider  
+

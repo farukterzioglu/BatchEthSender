@@ -10,6 +10,7 @@ relayer -> blockchain
 relayer contract ->   
 white list the caller  
 
+`hh batch-send --contact 0x84798995a40DCDadc0069DE232403F48101f6aD8 --amount 1000000000000 --network ropsten --subaccount 0 --paymentcount 10`
 
 https://medium.com/@paulina.blaszk/how-to-write-and-deploy-first-smart-contract-in-solidity-0-5-x-and-truffle-5-x-x-3054ec5328ad
 
@@ -47,10 +48,8 @@ https://github.com/ethereum/EIPs/pull/2770/files
 (recopient contract must be aware of forwarded data, 
 sender comes from different data, not from msg.sender)
 
-
 Multisend  
 https://github.com/realcodywburns/Tank-Farm/blob/master/contracts/other/multiSend.sol
-
 
 ### Notes
 Native Meta Transactions

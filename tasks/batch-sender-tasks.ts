@@ -3,10 +3,66 @@ import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-web3";
 import {AbiItem} from 'web3-utils';
 import HDWalletProvider from "@truffle/hdwallet-provider";
+import { TransactionReceipt } from "web3-eth";
+import Web3 from "web3";
+
+async function getTxFee(web3 : Web3, hash : string) : Promise<number> {
+    const receipt = await web3.eth.getTransactionReceipt(hash);
+    const tx = await web3.eth.getTransaction(hash);
+    
+    const fee = receipt.gasUsed * +web3.utils.fromWei(tx.gasPrice, 'ether') ;
+    return fee;
+}
+
+task("get-tx", "Get tx")
+  .addParam("hash", "Transaction hash")
+  .setAction(async (taskArgs, { web3 }) => {
+    const fee = await getTxFee(web3, taskArgs.hash );
+    console.log(`Tx fee: ${fee}`);
+  });
+
+task("batch-send-automated", "Send batch ETH transfers")
+  .setAction(
+    async (taskArgs, hre) => {
+      await hre.run("batch-send-sub", { 
+        contact: taskArgs.contact, 
+        amount: taskArgs.amount,
+        subaccount : 0,
+        paymentcount : 1
+      }); 
+
+      for (let i = 5; i <= 50; i += 5) {
+        await hre.run("batch-send-sub", { 
+          contact: taskArgs.contact, 
+          amount: taskArgs.amount,
+          subaccount : 0,
+          paymentcount : i
+        }); 
+      }
+    }
+  );
 
 task("batch-send", "Send batch ETH transfers")
   .addParam("contact", "Contract address")
   .addParam("amount", "Amount to send")
+  .addParam("subaccount", "Sub account")
+  .addParam("paymentcount", "Payment count")
+  .setAction(
+    async (taskArgs, hre) => {
+      await hre.run("batch-send-sub", { 
+        contact: taskArgs.contact, 
+        amount: taskArgs.amount,
+        subaccount : taskArgs.subaccount,
+        paymentcount : taskArgs.paymentcount
+      });
+    }
+  );
+
+subtask("batch-send-sub", "Send batch ETH transfers")
+  .addParam("contact", "Contract address")
+  .addParam("amount", "Amount to send")
+  .addParam("subaccount", "Sub account")
+  .addParam("paymentcount", "Payment count")
   .setAction(async (taskArgs, { web3 }) => {
       console.log(`Sending Eth...`);
 
@@ -79,7 +135,9 @@ task("batch-send", "Send batch ETH transfers")
       ];
       let contract = new web3.eth.Contract(abi, taskArgs.contact);
 
-      var paymentCount = 15;
+      var paymentCount :number = +taskArgs.paymentcount;
+      var totalAmount: number = 0;
+
       let receiverList : string[] = [
         '0x5caecc53d3640ebd9d10c73462e760032804baee',
         '0x4ce2992294fd9ff13a0913c8411a47dec5809e0c',
@@ -98,10 +156,22 @@ task("batch-send", "Send batch ETH transfers")
         '0x307c225fd184770ba965f5c468183165f9eb540f'
       ];
 
+      receiverList = new Array(paymentCount);
+
+      const walletMnemonic = 'rib odor chase panther tag hill nose symptom aisle together vacuum short appear plug genius';
+      const walletAPIUrl = 'https://ropsten.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161';
+
+      const provider = new HDWalletProvider(
+          walletMnemonic,
+          walletAPIUrl,
+          0, paymentCount, true, 
+          `m/44'/60'/0'/${taskArgs.subaccount}/`
+      );
+
       let amountList : string[] = new Array(paymentCount);
-      var totalAmount: number = 0;
       for (let i = 0; i < paymentCount; i++) {
         amountList[i] = taskArgs.amount;
+        receiverList[i] = provider.getAddress(i);
         console.log(`Sending ${web3.utils.fromWei(amountList[i], 'ether')} ETH to ${receiverList[i]}`);
 
         totalAmount += +web3.utils.fromWei(amountList[i], 'ether')
@@ -126,7 +196,8 @@ task("batch-send", "Send batch ETH transfers")
             console.log("Hash of the transaction: " + res)
           }
         )
-      
+
+      provider.engine.stop();
     }
 );
 

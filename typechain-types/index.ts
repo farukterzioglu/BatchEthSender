@@ -3,6 +3,8 @@
 /* eslint-disable */
 export type { BatchSender } from "./BatchSender";
 export type { Greeter } from "./Greeter";
+export type { TrickyContract } from "./TrickyContract";
 
 export { BatchSender__factory } from "./factories/BatchSender__factory";
 export { Greeter__factory } from "./factories/Greeter__factory";
+export { TrickyContract__factory } from "./factories/TrickyContract__factory";

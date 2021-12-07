@@ -29,26 +29,24 @@ contract BatchSender is ReentrancyGuard {
     //     emit Deposit(msg.value);
     // }
 
-    function sendEther(address[] calldata recipients, uint[] calldata amounts) public payable nonReentrant onlyOwner {
+    function multiSend(address[] calldata recipients, uint[] calldata amounts) public payable nonReentrant {
         require(recipients.length == amounts.length);
 
         uint totalAmount = msg.value;
-        address multiSender = msg.sender;
 
-        for (uint256 i; i < recipients.length; i++){
-            require(totalAmount >= amounts[i], "Not enough balance for the next payment");
-            assert(totalAmount - amounts[i] > 0);
+        for (uint i = 0; i < recipients.length; i++){
+            // require(totalAmount >= amounts[i], "Not enough balance for the next payment");
+            // assert(totalAmount - amounts[i] > 0);
             totalAmount = totalAmount - amounts[i];
 
             (bool success, ) = recipients[i].call{value: amounts[i]}("");
             require(success, "Transfer failed.");
-            emit EthTransferred(recipients[i], amounts[i]);
+            // emit EthTransferred(recipients[i], amounts[i]);
         }
 
-        if(totalAmount > 0) {
-            (bool success, ) = multiSender.call{value: totalAmount}("");
-            require(success, "Transfer failed.");
-            emit EthTransferred(multiSender, totalAmount);
-        }
+        // address multiSender = msg.sender;
+        // (bool refundSuccess, ) = multiSender.call{value: totalAmount}("");
+        // require(refundSuccess, "Transfer failed.");
+        // // emit EthTransferred(multiSender, totalAmount);
     }
 }

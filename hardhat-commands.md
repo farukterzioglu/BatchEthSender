@@ -36,3 +36,6 @@ https://github.com/nomiclabs/hardhat-hackathon-boilerplate
 ## Packages  
 npm install @truffle/hdwallet-provider  
 
+## Flatten 
+hh flatten contracts/batch-sender.sol > flatten.sol
+

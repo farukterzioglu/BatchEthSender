@@ -17,17 +17,17 @@ import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
 import { Listener, Provider } from "@ethersproject/providers";
 import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
-export interface BatchSenderInterface extends utils.Interface {
+export interface TrickyContractInterface extends utils.Interface {
   functions: {
-    "multiSend(address[],uint256[])": FunctionFragment;
+    "sendSingle(address,uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "multiSend",
-    values: [string[], BigNumberish[]]
+    functionFragment: "sendSingle",
+    values: [string, BigNumberish]
   ): string;
 
-  decodeFunctionResult(functionFragment: "multiSend", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "sendSingle", data: BytesLike): Result;
 
   events: {
     "Deposit(uint256)": EventFragment;
@@ -49,12 +49,12 @@ export type EthTransferredEvent = TypedEvent<
 
 export type EthTransferredEventFilter = TypedEventFilter<EthTransferredEvent>;
 
-export interface BatchSender extends BaseContract {
+export interface TrickyContract extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: BatchSenderInterface;
+  interface: TrickyContractInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -76,23 +76,23 @@ export interface BatchSender extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    multiSend(
-      recipients: string[],
-      amounts: BigNumberish[],
+    sendSingle(
+      recipient: string,
+      amount: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
 
-  multiSend(
-    recipients: string[],
-    amounts: BigNumberish[],
+  sendSingle(
+    recipient: string,
+    amount: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    multiSend(
-      recipients: string[],
-      amounts: BigNumberish[],
+    sendSingle(
+      recipient: string,
+      amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
   };
@@ -109,17 +109,17 @@ export interface BatchSender extends BaseContract {
   };
 
   estimateGas: {
-    multiSend(
-      recipients: string[],
-      amounts: BigNumberish[],
+    sendSingle(
+      recipient: string,
+      amount: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    multiSend(
-      recipients: string[],
-      amounts: BigNumberish[],
+    sendSingle(
+      recipient: string,
+      amount: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

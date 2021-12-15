@@ -61,6 +61,8 @@ task("batch-send-automated", "Send batch ETH transfers")
   .addParam("contact", "Contract address")
   .setAction(
     async (taskArgs, hre) => {
+      await hre.run("sendeth-sub", { account: "0x9cb56f534ce491468825277fd6c4c26e354f1797", amount: "1000000000000" });
+
       await hre.run("batch-send-sub", { 
         contact: taskArgs.contact, 
         amount: "1000000000000",
@@ -190,6 +192,7 @@ task("topoff", "Load Ethereum to the contract")
     }
 );
 
+// hh sendeth --account 0x9cb56f534ce491468825277fd6c4c26e354f1797 --amount 1000000000000000 --network ropsten
 task("sendeth", "Send Ethereum to the receiver")
   .addParam("account", "The receiver's address")
   .addParam("amount", "Amount to send")
